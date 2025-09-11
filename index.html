@@ -37,11 +37,14 @@
   <button id="submit">Записаться</button>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    if (!tg) {
-      alert("❌ Откройте WebApp через Telegram!");
-    } else {
+    // Проверяем, находимся ли мы в Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
       tg.expand();
+      tg.ready();
+      console.log("Работаем в Telegram WebApp");
+    } else {
+      console.log("Работаем вне Telegram - режим тестирования");
     }
 
     // Блокировка полей при галочке "Не делал / Не пользуюсь"
@@ -61,7 +64,7 @@
       return checked ? checked.value : null;
     }
 
-    // Тестовые данные (замени на fetch к API, когда будет готово)
+    // Тестовые данные
     const services = [
       { id: 1, title: "Ботекс" },
       { id: 2, title: "Чистка лица" }
@@ -91,7 +94,7 @@
       slotSelect.appendChild(opt);
     });
 
-    // Отправка данных в Telegram WebApp
+    // Отправка данных
     document.getElementById("submit").addEventListener("click", () => {
       const data = {
         service_id: serviceSelect.value,
@@ -102,8 +105,16 @@
       };
 
       console.log("Отправляем данные:", data);
-      tg.sendData(JSON.stringify(data));
-      setTimeout(() => tg.close(), 300); // небольшая задержка перед закрытием
+      
+      // Отправляем данные в Telegram бота
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.sendData(JSON.stringify(data));
+        tg.close();
+      } else {
+        alert("Тестовые данные: " + JSON.stringify(data));
+        console.log("Данные для отправки:", data);
+      }
     });
   </script>
 </body>
