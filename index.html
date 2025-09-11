@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>Запись на услугу</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, select { margin-top: 5px; width: 250px; padding: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  </style>
 </head>
 <body>
   <h2>Запись на услугу</h2>
 
   <!-- Выбор процедуры -->
   <label>Выберите процедуру:</label>
-  <select id="service"></select><br><br>
+  <select id="service"></select>
 
   <!-- Выбор слота -->
   <label>Выберите время:</label>
-  <select id="slot"></select><br><br>
+  <select id="slot"></select>
 
   <!-- Процедуры ранее -->
-  <label>Какие процедуры делали ранее?:</label><br>
+  <label>Какие процедуры делали ранее?:</label>
   <input type="text" id="previous-procedures" placeholder="Например: пилинг, массаж">
-  <label><input type="checkbox" id="none-procedures"> Не делал</label><br><br>
+  <label><input type="checkbox" id="none-procedures"> Не делал</label>
 
   <!-- Средства дома -->
-  <label>Какими средствами пользуетесь дома:</label><br>
+  <label>Какими средствами пользуетесь дома:</label>
   <input type="text" id="means-recommendations" placeholder="Например: крем, сыворотка">
-  <label><input type="checkbox" id="none-means"> Не пользуюсь</label><br><br>
+  <label><input type="checkbox" id="none-means"> Не пользуюсь</label>
 
   <!-- Ранее пользовались услугами косметолога -->
-  <label>Ранее пользовались услугами косметолога:</label><br>
+  <label>Ранее пользовались услугами косметолога:</label>
   <div id="used-before">
     <label><input type="radio" name="usedBefore" value="Да"> Да</label>
     <label><input type="radio" name="usedBefore" value="Нет"> Нет</label>
-  </div><br>
+  </div>
 
   <button id="submit">Записаться</button>
 
@@ -39,74 +45,64 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // --- имитация API ---
+    // Блокировка полей при галочке "Не делал / Не пользуюсь"
+    function setupBlockCheckbox(inputId, checkboxId) {
+      const input = document.getElementById(inputId);
+      const checkbox = document.getElementById(checkboxId);
+      checkbox.addEventListener("change", () => {
+        input.disabled = checkbox.checked;
+        if (checkbox.checked) input.value = "";
+      });
+    }
+    setupBlockCheckbox("previous-procedures", "none-procedures");
+    setupBlockCheckbox("means-recommendations", "none-means");
+
+    function getRadioValue(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : null;
+    }
+
+    // ==== Загружаем тестовые данные ====
     const services = [
       { id: 1, title: "Ботекс" },
       { id: 2, title: "Чистка лица" }
     ];
-
     const slots = [
       { id: 4, slot_datetime: "2025-09-10T12:00:00" },
       { id: 5, slot_datetime: "2025-09-10T13:00:00" },
       { id: 7, slot_datetime: "2025-09-10T15:00:00" }
     ];
 
-    // Заполнение процедур
-    const selService = document.getElementById("service");
+    const serviceSelect = document.getElementById("service");
     services.forEach(s => {
       const opt = document.createElement("option");
       opt.value = s.id;
       opt.textContent = s.title;
-      selService.appendChild(opt);
+      serviceSelect.appendChild(opt);
     });
 
-    // Заполнение слотов
-    const selSlot = document.getElementById("slot");
+    const slotSelect = document.getElementById("slot");
     slots.forEach(s => {
       const opt = document.createElement("option");
       opt.value = s.id;
       opt.textContent = new Date(s.slot_datetime).toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+        day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
       });
-      selSlot.appendChild(opt);
+      slotSelect.appendChild(opt);
     });
 
-    // Блокировка текстового поля при выборе чекбокса
-    function setupBlockCheckbox(inputId, checkboxId) {
-      const inputField = document.getElementById(inputId);
-      const checkbox = document.getElementById(checkboxId);
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-          inputField.value = "";
-          inputField.disabled = true;
-        } else {
-          inputField.disabled = false;
-        }
-      });
-    }
-    setupBlockCheckbox("previous-procedures", "none-procedures");
-    setupBlockCheckbox("means-recommendations", "none-means");
-
-    // Получение значения радио-кнопки
-    function getRadioValue(name) {
-      const checked = document.querySelector(`input[name="${name}"]:checked`);
-      return checked ? checked.value : null;
-    }
-
-    // Отправка данных в Telegram
+    // ==== Отправка данных в бот ====
     document.getElementById("submit").addEventListener("click", () => {
       const data = {
-        service_id: document.getElementById("service").value,
-        slot_id: document.getElementById("slot").value,
+        service_id: serviceSelect.value,
+        slot_id: slotSelect.value,
         makeusebefore: document.getElementById("previous-procedures").value || null,
         makemeansbefore: document.getElementById("means-recommendations").value || null,
         used_before: getRadioValue("usedBefore")
       };
 
+      console.log("Отправляем данные:", data);
       tg.sendData(JSON.stringify(data));
       tg.close();
     });
