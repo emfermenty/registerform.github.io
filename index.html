@@ -38,8 +38,13 @@
 
   <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    if (!tg) {
+      alert("❌ Откройте WebApp через Telegram!");
+    } else {
+      tg.expand();
+    }
 
+    // Блокировка полей при галочке "Не делал / Не пользуюсь"
     function setupBlockCheckbox(inputId, checkboxId) {
       const input = document.getElementById(inputId);
       const checkbox = document.getElementById(checkboxId);
@@ -56,7 +61,7 @@
       return checked ? checked.value : null;
     }
 
-    // ==== Тестовые данные ====
+    // Тестовые данные (замени на fetch к API, когда будет готово)
     const services = [
       { id: 1, title: "Ботекс" },
       { id: 2, title: "Чистка лица" }
@@ -86,9 +91,8 @@
       slotSelect.appendChild(opt);
     });
 
+    // Отправка данных в Telegram WebApp
     document.getElementById("submit").addEventListener("click", () => {
-      if (!tg) { alert("Откройте WebApp через Telegram!"); return; }
-
       const data = {
         service_id: serviceSelect.value,
         slot_id: slotSelect.value,
@@ -99,9 +103,7 @@
 
       console.log("Отправляем данные:", data);
       tg.sendData(JSON.stringify(data));
-
-      // закрываем WebApp через 0.3 секунды
-      setTimeout(() => tg.close(), 300);
+      setTimeout(() => tg.close(), 300); // небольшая задержка перед закрытием
     });
   </script>
 </body>
