@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Запись на услугу</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <h2>Запись на услугу</h2>
+
+  <!-- Выбор процедуры -->
+  <label>Выберите процедуру:</label>
+  <select id="service"></select><br><br>
+
+  <!-- Выбор слота -->
+  <label>Выберите время:</label>
+  <select id="slot"></select><br><br>
+
+  <!-- Процедуры ранее -->
+  <label>Какие процедуры делали ранее?:</label><br>
+  <input type="text" id="previous-procedures" placeholder="Например: пилинг, массаж">
+  <label><input type="checkbox" id="none-procedures"> Не делал</label><br><br>
+
+  <!-- Средства дома -->
+  <label>Какими средствами пользуетесь дома:</label><br>
+  <input type="text" id="means-recommendations" placeholder="Например: крем, сыворотка">
+  <label><input type="checkbox" id="none-means"> Не пользуюсь</label><br><br>
+
+  <!-- Ранее пользовались услугами косметолога -->
+  <label>Ранее пользовались услугами косметолога:</label><br>
+  <div id="used-before">
+    <label><input type="radio" name="usedBefore" value="Да"> Да</label>
+    <label><input type="radio" name="usedBefore" value="Нет"> Нет</label>
+  </div><br>
+
+  <button id="submit">Записаться</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function setupBlockCheckbox(inputId, checkboxId) {
+      const inputField = document.getElementById(inputId);
+      const checkbox = document.getElementById(checkboxId);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          inputField.value = "";
+          inputField.disabled = true;
+        } else {
+          inputField.disabled = false;
+        }
+      });
+    }
+
+    setupBlockCheckbox("previous-procedures", "none-procedures");
+    setupBlockCheckbox("means-recommendations", "none-means");
+
+    function getRadioValue(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : null;
+    }
+
+    // Загружаем процедуры
+    fetch("http://127.0.0.1:8000/api/services")
+      .then(r => r.json())
+      .then(services => {
+        const sel = document.getElementById("service");
+        services.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = s.title;
+          sel.appendChild(opt);
+        });
+      });
+
+    // Загружаем слоты
+    fetch("http://127.0.0.1:8000/api/slots")
+      .then(r => r.json())
+      .then(slots => {
+        const sel = document.getElementById("slot");
+        slots.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = new Date(s.slot_datetime).toLocaleString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+          sel.appendChild(opt);
+        });
+      });
+
+    // Отправляем данные в бота
+    document.getElementById("submit").addEventListener("click", () => {
+      const data = {
+        service_id: document.getElementById("service").value,
+        slot_id: document.getElementById("slot").value,
+        makeusebefore: document.getElementById("previous-procedures").value || null,
+        makemeansbefore: document.getElementById("means-recommendations").value || null,
+        used_before: getRadioValue("usedBefore")
+      };
+
+      // отправляем в Telegram WebApp
+      tg.sendData(JSON.stringify(data));
+
+      // можно сразу закрыть WebApp
+      tg.close();
+    });
+  </script>
+</body>
+</html>
