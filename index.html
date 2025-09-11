@@ -39,6 +39,43 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
+    // --- имитация API ---
+    const services = [
+      { id: 1, title: "Ботекс" },
+      { id: 2, title: "Чистка лица" }
+    ];
+
+    const slots = [
+      { id: 4, slot_datetime: "2025-09-10T12:00:00" },
+      { id: 5, slot_datetime: "2025-09-10T13:00:00" },
+      { id: 7, slot_datetime: "2025-09-10T15:00:00" }
+    ];
+
+    // Заполнение процедур
+    const selService = document.getElementById("service");
+    services.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.title;
+      selService.appendChild(opt);
+    });
+
+    // Заполнение слотов
+    const selSlot = document.getElementById("slot");
+    slots.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = new Date(s.slot_datetime).toLocaleString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      selSlot.appendChild(opt);
+    });
+
+    // Блокировка текстового поля при выборе чекбокса
     function setupBlockCheckbox(inputId, checkboxId) {
       const inputField = document.getElementById(inputId);
       const checkbox = document.getElementById(checkboxId);
@@ -51,48 +88,16 @@
         }
       });
     }
-
     setupBlockCheckbox("previous-procedures", "none-procedures");
     setupBlockCheckbox("means-recommendations", "none-means");
 
+    // Получение значения радио-кнопки
     function getRadioValue(name) {
       const checked = document.querySelector(`input[name="${name}"]:checked`);
       return checked ? checked.value : null;
     }
 
-    // Загружаем процедуры
-    fetch("http://127.0.0.1:8000/api/services")
-      .then(r => r.json())
-      .then(services => {
-        const sel = document.getElementById("service");
-        services.forEach(s => {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent = s.title;
-          sel.appendChild(opt);
-        });
-      });
-
-    // Загружаем слоты
-    fetch("http://127.0.0.1:8000/api/slots")
-      .then(r => r.json())
-      .then(slots => {
-        const sel = document.getElementById("slot");
-        slots.forEach(s => {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent = new Date(s.slot_datetime).toLocaleString("ru-RU", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-          sel.appendChild(opt);
-        });
-      });
-
-    // Отправляем данные в бота
+    // Отправка данных в Telegram
     document.getElementById("submit").addEventListener("click", () => {
       const data = {
         service_id: document.getElementById("service").value,
@@ -102,10 +107,7 @@
         used_before: getRadioValue("usedBefore")
       };
 
-      // отправляем в Telegram WebApp
       tg.sendData(JSON.stringify(data));
-
-      // можно сразу закрыть WebApp
       tg.close();
     });
   </script>
