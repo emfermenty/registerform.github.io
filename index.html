@@ -35,6 +35,15 @@
   <label>Какие средства использовали?</label>
   <input type="text" id="means">
 
+  <label>Сфера деятельности:</label>
+  <input type="text" id="viewjob" placeholder="Например, программист">
+
+  <label>Желаемый результат:</label>
+  <input type="text" id="result" placeholder="Что хотите получить от процедуры">
+
+  <label>Жалобы:</label>
+  <textarea id="complaints" placeholder="Опишите ваши жалобы"></textarea>
+
   <button onclick="sendData()">Отправить</button>
 
   <script>
@@ -46,7 +55,10 @@
         chronic_diseases: document.getElementById("chronic").value,
         makeusebefore: document.getElementById("makeusebefore").value === "true",
         makeprocedurebefore: document.getElementById("procedure").value,
-        makemeansbefore: document.getElementById("means").value
+        makemeansbefore: document.getElementById("means").value,
+        viewjob: document.getElementById("viewjob").value,
+        result: document.getElementById("result").value,
+        complaints: document.getElementById("complaints").value
       };
       tg.sendData(JSON.stringify(data));
       tg.close();
