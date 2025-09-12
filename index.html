@@ -52,16 +52,38 @@
       box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
     }
 
-    .checkbox-group, .radio-group {
-      margin-top: 8px;
-    }
-    .checkbox-group label,
-    .radio-group label {
+    /* чекбоксы/радио в одну строку с полем */
+    .input-with-checkbox {
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+    .input-with-checkbox input[type="text"] {
+      flex: 1;
+      min-width: 0;
+    }
+    .input-with-checkbox label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0;
+      font-size: 14px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    /* для радиокнопок да/нет */
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 8px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
       font-size: 15px;
-      margin-top: 5px;
       color: #444;
     }
 
@@ -102,14 +124,14 @@
     <select id="slot"></select>
 
     <label>Какие процедуры делали ранее?</label>
-    <input type="text" id="previous-procedures" placeholder="Например: пилинг, массаж">
-    <div class="checkbox-group">
+    <div class="input-with-checkbox">
+      <input type="text" id="previous-procedures" placeholder="Например: пилинг, массаж">
       <label><input type="checkbox" id="none-procedures"> Не делал</label>
     </div>
 
     <label>Какими средствами пользуетесь дома:</label>
-    <input type="text" id="means-recommendations" placeholder="Например: крем, сыворотка">
-    <div class="checkbox-group">
+    <div class="input-with-checkbox">
+      <input type="text" id="means-recommendations" placeholder="Например: крем, сыворотка">
       <label><input type="checkbox" id="none-means"> Не пользуюсь</label>
     </div>
 
@@ -155,7 +177,7 @@
       return checked ? checked.value : null;
     }
 
-    // Тестовые данные
+    // тестовые данные
     const services = [
       { id: 1, title: "Ботекс" },
       { id: 2, title: "Чистка лица" }
