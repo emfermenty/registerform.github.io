@@ -52,7 +52,6 @@
       box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
     }
 
-    /* чекбоксы/радио в одну строку с полем */
     .input-with-checkbox {
       display: flex;
       align-items: center;
@@ -66,18 +65,22 @@
     .input-with-checkbox label {
       display: flex;
       align-items: center;
-      gap: 0.1rem;
+      gap: 0.25rem;
       margin: 0;
       font-size: 14px;
       color: #555;
       white-space: nowrap;
+      cursor: pointer;
     }
 
-    /* для радиокнопок да/нет */
+    /* Радиокнопки */
     .radio-group {
       display: flex;
-      gap: 20px;
+      gap: 30px;
       margin-top: 8px;
+    }
+    .radio-group input[type="radio"] {
+      margin: 0;
     }
     .radio-group label {
       display: flex;
@@ -86,6 +89,8 @@
       margin: 0;
       font-size: 15px;
       color: #444;
+      cursor: pointer;
+      user-select: none;
     }
 
     button {
@@ -118,28 +123,28 @@
   <div class="card">
     <h2>📌 Запись на услугу</h2>
 
-    <label>Выберите процедуру:</label>
+    <label for="service">Выберите процедуру:</label>
     <select id="service"></select>
 
-    <label>Выберите время:</label>
+    <label for="slot">Выберите время:</label>
     <select id="slot"></select>
 
-    <label>Какие процедуры делали ранее?</label>
+    <label for="previous-procedures">Какие процедуры делали ранее?</label>
     <div class="input-with-checkbox">
       <input type="text" id="previous-procedures" placeholder="Например: пилинг, массаж">
-      <label><input type="checkbox" id="none-procedures"> Не делал</label>
+      <label for="none-procedures"><input type="checkbox" id="none-procedures"> Не делал</label>
     </div>
 
-    <label>Какими средствами пользуетесь дома:</label>
+    <label for="means-recommendations">Какими средствами пользуетесь дома:</label>
     <div class="input-with-checkbox">
       <input type="text" id="means-recommendations" placeholder="Например: крем, сыворотка">
-      <label><input type="checkbox" id="none-means"> Не пользуюсь</label>
+      <label for="none-means"><input type="checkbox" id="none-means"> Не пользуюсь</label>
     </div>
 
     <label>Ранее пользовались услугами косметолога:</label>
     <div class="radio-group" id="used-before">
-      <label><input type="radio" name="usedBefore" value="Да"> Да</label>
-      <label><input type="radio" name="usedBefore" value="Нет"> Нет</label>
+      <label for="used-yes"><input type="radio" id="used-yes" name="usedBefore" value="Да"> Да</label>
+      <label for="used-no"><input type="radio" id="used-no" name="usedBefore" value="Нет"> Нет</label>
     </div>
 
     <button id="submit">Записаться</button>
