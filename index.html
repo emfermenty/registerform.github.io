@@ -50,6 +50,7 @@
     function sendData() {
       const tg = window.Telegram.WebApp;
       const data = {
+        action: "register",
         username: document.getElementById("username").value,
         birthday: document.getElementById("birthday").value,
         chronic_diseases: document.getElementById("chronic").value,
